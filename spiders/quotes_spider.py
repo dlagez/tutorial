@@ -10,12 +10,15 @@ class QuotesSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://pubmed.ncbi.nlm.nih.gov/?term=RNAseq%2Bgenewiz',
+            # 'https://pubmed.ncbi.nlm.nih.gov/?term=RNAseq%2Bgenewiz',
+            'https://pubmed.ncbi.nlm.nih.gov/?term=RNAseq%2Bgenewiz&size=200',
         ]
         for url in urls:
-            for i in range(1, 3):
-                url = url + "&page=" + str(i) 
-                yield scrapy.Request(url=url, callback=self.parse)
+            for i in range(1, 2):
+                for j in range(2000, 2023):
+                    url1 = url + "&filter=years."+str(j)+"-"+str(j)    
+                    url2 = url1 + "&page=" + str(i)
+                    yield scrapy.Request(url=url2, callback=self.parse)
 
     def parse(self, response):
         href = response.xpath("//*[@id='search-results']/section/div[1]/div/article[2]/div[2]/div[1]/a/@href").extract()[0]
@@ -65,14 +68,14 @@ class QuotesSpider(scrapy.Spider):
                 "author": author_email_map,
                 "url(Click url to access page)": response.url,
             }
-        else:
-            author_email_map["author"] = ""
-            author_email_map["email"] = "can't find any email in this page"
-            yield {
-                "title": title,
-                "author": author_email_map,
-                "url(Click url to access page)": response.url,
-            }
+        # else:
+        #     author_email_map["author"] = ""
+        #     author_email_map["email"] = "can't find any email in this page"
+        #     yield {
+        #         "title": title,
+        #         "author": author_email_map,
+        #         "url(Click url to access page)": response.url,
+        #     }
 
     def emailre(testStr):
         email=re.compile(r'([a-zA-Z0-9_.+-]+@[a-pr-zA-PRZ0-9-]+\.[a-zA-Z0-9-.]+)')
