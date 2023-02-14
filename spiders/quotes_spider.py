@@ -334,7 +334,7 @@ class QuotesSpider(scrapy.Spider):
                     'PharmatrophiX',
                     'Phathom+Pharmaceuticals']
         for key_word in key_words:
-            url = base_url + key_word + plus + 'WES' + page_size
+            url = base_url + key_word + plus + 'Cellranger' + page_size
             urls.append(url)
 
         for url in urls:
