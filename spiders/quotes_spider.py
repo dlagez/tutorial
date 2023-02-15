@@ -11,6 +11,9 @@ class QuotesSpider(scrapy.Spider):
     def start_requests(self):
         base_url = 'https://pubmed.ncbi.nlm.nih.gov/?term='
         plus = '%2B'
+        left_parenthesis = '%28'
+        right_parenthesis = '%29'
+        and_fu = '+AND+'
         page_size = '&size=200'
         urls = [
             # 'https://pubmed.ncbi.nlm.nih.gov/?term=RNAseq%2Bgenewiz',
@@ -18,7 +21,19 @@ class QuotesSpider(scrapy.Spider):
             # 'https://pubmed.ncbi.nlm.nih.gov/?term=RNAseq%2Bgenewiz&size=200',
         ]
         # key_words = ['Abbott']
-        key_words = ['Abbott',
+        key_words = [
+                    'JNJ-Janssen',
+                    'Genentech',
+                    'Gilead+Sciences',
+                    'Amgen',
+                    'Biogen',
+                    'Veracyte',
+                    'Tesaro',
+                    'BioMarin+Pharmaceutical+Inc',
+                    'Nektar+Therapeutics',
+                    'CytomX+Therapeutics',
+                    'Denali+Therapeutics',
+                    'Abbott',
                     'Acepodia',
                     'AgeX+Therapeutics',
                     'AllCells',
@@ -334,7 +349,7 @@ class QuotesSpider(scrapy.Spider):
                     'PharmatrophiX',
                     'Phathom+Pharmaceuticals']
         for key_word in key_words:
-            url = base_url + key_word + plus + 'Cellranger' + page_size
+            url = base_url + left_parenthesis + key_word + right_parenthesis + and_fu + left_parenthesis + 'Cellranger' + right_parenthesis + page_size
             urls.append(url)
 
         for url in urls:
