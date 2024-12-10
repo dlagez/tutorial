@@ -40,7 +40,7 @@ class QuotesSpider(scrapy.Spider):
     def parse_email(self, response):
         email=re.compile(r'[a-z0-9\-\.]+@[0-9a-z\-\.]+')
         title = response.xpath("//*[@class='heading-title']/text()").extract()[0].rstrip().lstrip()
-        affiliation_list = response.xpath("//*[@id='full-view-expanded-authors']/div/ul/li/text()")
+        # affiliation_list = response.xpath("//*[@id='full-view-expanded-authors']/div/ul/li/text()")
         #affiliation_list_content = response.xpath("//*[@id='full-view-expanded-authors']/div/ul/li/text()").extract()
         # for affiliation in affiliation_list:
             # affiliation_content = affiliation.root
@@ -50,37 +50,43 @@ class QuotesSpider(scrapy.Spider):
         #     "title": title,
         #     "affiliation_list": affiliation_list_content
         # }
-        author_email_map = dict()
+        
+        authors = []
         author_item = response.xpath("//*[@class='authors-list-item ']")
         for item in author_item:
+
+            author_email_map = dict()
             author = item.xpath("a/text()").extract()[0]
             affiliationSupList = item.xpath("sup/a/@title").extract()
+            
             if len(affiliationSupList) > 0:
-                affiliation = item.xpath("sup/a/@title").extract()[0]
-                #emailSet=set()
+                affiliation = affiliationSupList[0]
                 emailList = email.findall(affiliation)
+                
                 if len(emailList) > 0:
-                    em = emailList[0]
-                    char = em[-1]
-                    if (char == "."):
-                        em = em[0: -1]
                     author_email_map["author"] = author
-                    author_email_map["email"] = em
+                    # Collect all emails for this author
+                    author_email_map["emails"] = emailList  # List of emails
+                    authors.append(author_email_map)
+            
 
-        if len(author_email_map) > 0:
+        if len(authors) > 0:
             yield {
                 "title": title,
-                "author": author_email_map,
+                "author": authors,
+                # "author": author_email_map["author"],
+                # "emails": author_email_map["emails"],  # List of emails
                 "url(Click url to access page)": response.url,
             }
-        # else:
-        #     author_email_map["author"] = ""
-        #     author_email_map["email"] = "can't find any email in this page"
-        #     yield {
-        #         "title": title,
-        #         "author": author_email_map,
-        #         "url(Click url to access page)": response.url,
-        #     }
+        else:
+            yield {
+                "title": title,
+                "author": "no find authors",
+                # "author": author_email_map["author"],
+                # "emails": author_email_map["emails"],  # List of emails
+                "url(Click url to access page)": response.url,
+            }
+
 
     def emailre(testStr):
         email=re.compile(r'([a-zA-Z0-9_.+-]+@[a-pr-zA-PRZ0-9-]+\.[a-zA-Z0-9-.]+)')
