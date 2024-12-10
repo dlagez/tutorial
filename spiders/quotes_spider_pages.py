@@ -2,7 +2,8 @@ from pathlib import Path
 
 import scrapy
 import re
-
+import os
+os.environ['SCRAPY_REACTOR'] = 'twisted.internet.selectreactor.SelectReactor'
 
 
 class QuotesSpider(scrapy.Spider):
@@ -11,21 +12,25 @@ class QuotesSpider(scrapy.Spider):
     def start_requests(self):
         
         urls = [
-            'https://pubmed.ncbi.nlm.nih.gov/?term=princeton.edu&page='
+            'https://pubmed.ncbi.nlm.nih.gov/?term=novogene&page='
         ]
 
         for url in urls:
-            for page_index in range(1, 470):
+            for page_index in range(1, 42):
                 url1 = url + str(page_index)
                 yield scrapy.Request(url=url1, callback=self.parse)
 
     def parse(self, response):
         # href = response.xpath("//*[@id='search-results']/section/div[1]/div/article[2]/div[2]/div[1]/a/@href").extract()[0]
-        href_list = response.xpath("//*[@id='search-results']/section/div[1]/div/article/div[2]/div[1]/a/@href")
+        # href_list = response.xpath("//*[@id='search-results']/section/div[1]/div/article/div[2]/div[1]/a/@href")
+        href_list = response.xpath('//a[@class="docsum-title"]/@href').extract()
         if len(href_list) > 0:
             for href_name in href_list:
-                root = href_name.root
-                href_link = "https://pubmed.ncbi.nlm.nih.gov" + root
+                # root = href_name.root
+                href_link = "https://pubmed.ncbi.nlm.nih.gov" + href_name
+
+                self.logger.info(f"Extracted URL: {href_link}")
+
                 yield scrapy.Request(
                     url=href_link,
                     callback=self.parse_email,
