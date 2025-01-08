@@ -1,7 +1,8 @@
 quotes.jsonl
- quotes.json
+quotes.json
 quotes.json
 *.json
 /__pycache__
 spiders/__pycache__
 demo.py
+*.csv
